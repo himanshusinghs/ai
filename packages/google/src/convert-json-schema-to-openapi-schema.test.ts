@@ -23,32 +23,8 @@ it('should remove additionalProperties and $schema', () => {
   expect(convertJSONSchemaToOpenAPISchema(input)).toEqual(expected);
 });
 
-it('supports additionalProperties: true', () => {
-  const input: JSONSchema7 = {
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    type: 'object',
-    properties: {
-      name: { type: 'string' },
-      age: { type: 'number' },
-    },
-    additionalProperties: true,
-  };
-
-  const expected = {
-    type: 'object',
-    properties: {
-      name: { type: 'string' },
-      age: { type: 'number' },
-    },
-    additionalProperties: true,
-  };
-
-  expect(convertJSONSchemaToOpenAPISchema(input)).toEqual(expected);
-});
-
-// z.record(z.string())
-it('supports `additionalProperties` as an object', () => {
-  const input: JSONSchema7 = {
+const inputs: JSONSchema7[] = [
+  {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     properties: {
@@ -56,19 +32,41 @@ it('supports `additionalProperties` as an object', () => {
       age: { type: 'number' },
     },
     additionalProperties: { type: 'string' },
-  };
-
-  const expected = {
+  },
+  {
+    $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     properties: {
       name: { type: 'string' },
       age: { type: 'number' },
     },
-    additionalProperties: { type: 'string' },
-  };
+    additionalProperties: {},
+  },
+  {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      name: { type: 'string' },
+      age: { type: 'number' },
+    },
+    additionalProperties: true,
+  },
+];
 
-  expect(convertJSONSchemaToOpenAPISchema(input)).toEqual(expected);
-});
+it.each(inputs)(
+  `should remove additionalProperties = $additionalProperties within properties of object type as well`,
+  input => {
+    const expected = {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        age: { type: 'number' },
+      },
+    };
+
+    expect(convertJSONSchemaToOpenAPISchema(input)).toEqual(expected);
+  },
+);
 
 it('should handle nested objects and arrays', () => {
   const input: JSONSchema7 = {

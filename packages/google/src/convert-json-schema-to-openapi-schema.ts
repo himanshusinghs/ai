@@ -116,11 +116,12 @@ export function convertJSONSchemaToOpenAPISchema(
     result.minLength = minLength;
   }
 
-  if (additionalProperties === true) {
-    result.additionalProperties = true;
-  } else if (additionalProperties) {
-    result.additionalProperties =
-      convertJSONSchemaToOpenAPISchema(additionalProperties);
+  if (additionalProperties) {
+    // Google Function declarations do not support additionalProperties so we
+    // should avoid adding them entirely.
+    // Ref: https://ai.google.dev/api/caching#FunctionDeclaration
+    // result.additionalProperties =
+    // convertJSONSchemaToOpenAPISchema(additionalProperties);
   }
 
   return result;
